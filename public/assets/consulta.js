@@ -115,15 +115,18 @@ function render(data) {
         ${esc(product.categoria)}${product.presentacion ? ` · ${esc(product.presentacion)}` : ''}
       </div>
       <div class="prices">
-        <div>
+        <div class="price-primary">
           ${product.precio_disponible
-            ? `<div class="usd">${moneyUsd(product.precio_usd)}</div>
+            ? `<div class="bs">${moneyBs(product.precio_bs)}</div>
                <div class="tiny muted">IVA incluido</div>`
-            : `<div class="usd" style="font-size:.98rem;">Consultar precio</div>
+            : `<div class="bs">Consultar precio</div>
                <div class="tiny muted">Disponible en tienda</div>`}
         </div>
-        <div class="bs">
-          ${product.precio_disponible ? `${moneyBs(product.precio_bs)}<br><span class="tiny">referencial</span>` : ''}
+        <div class="price-reference">
+          ${product.precio_disponible
+            ? `<div class="usd">${moneyUsd(product.precio_usd)}</div>
+               <div class="tiny muted">referencial</div>`
+            : ''}
         </div>
       </div>
     </article>

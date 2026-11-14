@@ -757,8 +757,9 @@ dialog.wide { width: min(860px, calc(100% - 28px)); }
 }
 .product-card .desc { color: var(--muted); font-size: 0.78rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
 .product-card .prices { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; border-top: 1px solid var(--line); padding-top: 10px; }
-.product-card .prices .usd { font-size: 1.15rem; font-weight: 750; letter-spacing: -0.02em; }
-.product-card .prices .bs { color: var(--muted); font-size: 0.78rem; text-align: right; }
+.product-card .prices .bs { color: var(--brand-dark); font-size: 1.15rem; font-weight: 750; letter-spacing: -0.02em; }
+.product-card .prices .usd { color: var(--muted); font-size: 0.78rem; font-weight: 600; text-align: right; }
+.product-card .prices .price-reference { text-align: right; }
 .product-card .cat { font-size: 0.7rem; color: var(--muted); }
 
 .public-note { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px 15px; color: var(--muted); font-size: 0.78rem; margin-top: 18px; }
