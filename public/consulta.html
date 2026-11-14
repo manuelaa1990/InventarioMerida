@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Consulta de repuestos · Repuestos MERIDA</title>
+  <meta name="description" content="Consulta disponibilidad y precios referenciales de repuestos para refrigeración y aire acondicionado.">
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d9488'/%3E%3Ctext x='32' y='42' font-family='Arial' font-size='24' font-weight='bold' fill='white' text-anchor='middle'%3EHV%3C/text%3E%3C/svg%3E">
+</head>
+<body class="public-body">
+
+<header class="public-hero">
+  <div class="container">
+    <div class="public-header">
+      <div class="public-brand">
+        <img src="assets/logo.png" alt="" aria-hidden="true">
+        <div>
+          <strong>Repuestos MERIDA</strong>
+          <small>Repuestos de refrigeración y aire acondicionado</small>
+        </div>
+      </div>
+      <a class="public-login" href="index.html" aria-label="Acceso administrativo" title="Acceso administrativo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="8" r="3.5"></circle>
+          <path d="M5 20v-1a7 7 0 0 1 14 0v1"></path>
+        </svg>
+      </a>
+    </div>
+
+    <h1>Consulta</h1>
+
+    <form class="public-search" id="searchForm">
+      <input type="search" id="searchInput" placeholder="Ej: capacitor 25uF, ROL449, bimetales, pila…" autocomplete="off" autofocus>
+      <button type="submit" class="btn">Buscar</button>
+    </form>
+  </div>
+</header>
+
+<main class="container public-main">
+  <div class="public-meta">
+    <span id="resultCount">Cargando catálogo…</span>
+    <span id="rateInfo"></span>
+  </div>
+
+  <div class="public-grid" id="results" aria-live="polite"></div>
+  <div id="emptyState" class="empty hidden"></div>
+
+  <div class="public-note">
+    <strong>Importante:</strong> la disponibilidad y los precios pueden cambiar sin previo aviso.
+    El precio en bolívares se calcula con la tasa BCV configurada y puede variar al momento de la compra.
+    Confirma con el negocio antes de realizar tu pedido.
+  </div>
+
+  <footer class="public-footer">
+    <span>Repuestos MERIDA · Consulta pública</span>
+    <span id="updatedAt"></span>
+  </footer>
+</main>
+
+<script src="assets/consulta.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Inventario HVAC · Panel administrativo</title>
+  <meta name="description" content="Panel de inventario, costos y ventas para repuestos de refrigeración.">
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d9488'/%3E%3Ctext x='32' y='42' font-family='Arial' font-size='24' font-weight='bold' fill='white' text-anchor='middle'%3EHV%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="authScreen" class="auth-screen">
+  <div class="auth-card">
+    <span class="brand-mark">HV</span>
+    <h1>Inventario HVAC</h1>
+    <p>Panel administrativo de repuestos y ventas</p>
+
+    <form id="loginForm" autocomplete="on">
+      <div class="field">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password" autofocus>
+      </div>
+      <button type="submit" class="btn" id="loginBtn">Entrar al panel</button>
+      <p class="auth-error" id="loginError" role="alert"></p>
+    </form>
+
+    <p class="auth-footer">
+      ¿Solo quieres consultar disponibilidad?<br>
+      <a href="consulta.html">Ir a la consulta pública</a>
+    </p>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app" class="hidden">
+  <header class="app-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <span class="brand-mark small">HV</span>
+        <div>
+          <strong>Inventario HVAC</strong>
+          <small>Control de repuestos</small>
+        </div>
+      </div>
+
+      <nav class="tabs" id="tabs" aria-label="Secciones">
+        <button class="tab active" data-tab="panel">Panel</button>
+        <button class="tab" data-tab="inventario">Inventario</button>
+        <button class="tab" data-tab="ventas">Ventas</button>
+        <button class="tab" data-tab="movimientos">Movimientos</button>
+        <button class="tab" data-tab="config">Configuración</button>
+      </nav>
+
+      <div class="header-actions">
+        <a class="btn ghost sm" href="consulta.html" target="_blank" rel="noopener">Consulta pública</a>
+        <button class="btn ghost sm" id="logoutBtn">Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main">
+
+    <!-- ---------- PANEL ---------- -->
+    <section id="view-panel" class="view">
+      <div class="view-head">
+        <div>
+          <h1>Panel de control</h1>
+          <p class="sub" id="panelDate">Resumen del inventario</p>
+        </div>
+        <div class="view-actions">
+          <button class="btn ghost" data-act="refresh">Actualizar</button>
+          <button class="btn" data-act="new-product">+ Nuevo producto</button>
+        </div>
+      </div>
+
+      <div class="stat-grid" id="statGrid"></div>
+      <div class="balance-strip" id="balanceStrip"></div>
+
+      <div class="grid-2">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Productos con stock bajo</h2>
+            <button class="btn ghost sm" data-go="inventario">Ver inventario</button>
+          </div>
+          <div class="panel-body flush" id="lowStockList"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Últimos movimientos</h2>
+            <button class="btn ghost sm" data-go="movimientos">Ver todos</button>
+          </div>
+          <div id="recentMovs"></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ---------- INVENTARIO ---------- -->
+    <section id="view-inventario" class="view hidden">
+      <div class="view-head">
+        <div>
+          <h1>Inventario</h1>
+          <p class="sub">Costos, márgenes y precios calculados automáticamente</p>
+        </div>
+        <div class="view-actions">
+          <button class="btn ghost" data-act="export">Exportar CSV</button>
+          <button class="btn" data-act="new-product">+ Nuevo producto</button>
+        </div>
+      </div>
+
+      <section class="panel">
+        <div class="toolbar">
+          <div class="search-box">
+            <span class="ico">⌕</span>
+            <input type="search" id="invSearch" placeholder="Buscar por código, nombre, categoría o TAG…" autocomplete="off">
+          </div>
+          <select id="invCategory" aria-label="Filtrar por categoría">
+            <option value="">Todas las categorías</option>
+          </select>
+          <div class="seg" id="invStockFilter" aria-label="Filtrar por existencia">
+            <button class="active" data-filter="todos">Todos</button>
+            <button data-filter="bajo">Stock bajo</button>
+            <button data-filter="agotado">Agotados</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th class="right">Stock</th>
+                <th class="right">Costo $ Binance</th>
+                <th class="right">Margen</th>
+                <th class="right">Precio $ BCV</th>
+                <th class="right">Precio Bs</th>
+                <th class="right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="invBody"></tbody>
+          </table>
+          <div class="empty hidden" id="invEmpty">
+            <strong>Sin resultados</strong>
+            Prueba con otro término o cambia los filtros.
+          </div>
+        </div>
+
+        <div class="toolbar" style="border-bottom:0; border-top:1px solid var(--line);">
+          <span class="small muted" id="invCount"></span>
+          <span class="small muted" style="margin-left:auto;">Los precios incluyen IVA · calculados con la tasa configurada</span>
+        </div>
+      </section>
+    </section>
+
+    <!-- ---------- VENTAS ---------- -->
+    <section id="view-ventas" class="view hidden">
+      <div class="view-head">
+        <div>
+          <h1>Ventas</h1>
+          <p class="sub">Registra una salida y el stock se descuenta automáticamente</p>
+        </div>
+        <div class="view-actions">
+          <button class="btn ghost" data-act="refresh">Actualizar</button>
+        </div>
+      </div>
+
+      <div class="sale-layout">
+        <div class="stack">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Nueva venta</h2>
+              <span class="badge neutral" id="saleRateBadge">Tasa BCV</span>
+            </div>
+
+            <div class="sale-meta">
+              <div class="field">
+                <label for="saleClient">Cliente (opcional)</label>
+                <input type="text" id="saleClient" placeholder="Nombre o teléfono" maxlength="160">
+              </div>
+              <div class="field">
+                <label for="saleRate">Tasa BCV (Bs/USD)</label>
+                <input type="number" id="saleRate" min="0.01" step="0.01">
+              </div>
+            </div>
+
+            <div class="panel-body">
+              <div class="search-box" style="max-width:none;">
+                <span class="ico">⌕</span>
+                <input type="search" id="saleSearch" placeholder="Buscar producto para agregar…" autocomplete="off">
+              </div>
+              <div id="saleResults"></div>
+            </div>
+
+            <div class="cart-list" id="cartList"></div>
+            <div class="cart-total" id="cartTotals"></div>
+
+            <div class="panel-body">
+              <div class="field">
+                <label for="saleNote">Nota (opcional)</label>
+                <textarea id="saleNote" maxlength="500" placeholder="Detalles de la venta, forma de pago, etc."></textarea>
+              </div>
+              <button class="btn block" id="saleSubmit" style="margin-top:14px;">Registrar venta</button>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Ventas recientes</h2>
+          </div>
+          <div class="sale-history" id="saleHistory"></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ---------- MOVIMIENTOS ---------- -->
+    <section id="view-movimientos" class="view hidden">
+      <div class="view-head">
+        <div>
+          <h1>Movimientos</h1>
+          <p class="sub">Historial de entradas, salidas, ajustes y ventas</p>
+        </div>
+        <div class="view-actions">
+          <button class="btn ghost" data-act="refresh">Actualizar</button>
+        </div>
+      </div>
+
+      <section class="panel">
+        <div class="toolbar">
+          <div class="search-box">
+            <span class="ico">⌕</span>
+            <input type="search" id="movSearch" placeholder="Buscar por producto, motivo o referencia…" autocomplete="off">
+          </div>
+          <select id="movType" aria-label="Filtrar por tipo">
+            <option value="">Todos los tipos</option>
+            <option value="entrada">Entradas</option>
+            <option value="salida">Salidas</option>
+            <option value="ajuste">Ajustes</option>
+            <option value="venta">Ventas</option>
+            <option value="inicial">Carga inicial</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Producto</th>
+                <th class="right">Cantidad</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody id="movBody"></tbody>
+          </table>
+          <div class="empty hidden" id="movEmpty">
+            <strong>Sin movimientos</strong>
+            No hay registros que coincidan con el filtro.
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ---------- CONFIGURACIÓN ---------- -->
+    <section id="view-config" class="view hidden">
+      <div class="view-head">
+        <div>
+          <h1>Configuración de cálculo</h1>
+          <p class="sub">Estos valores se aplican a todos los productos que no tengan margen propio</p>
+        </div>
+      </div>
+
+      <div class="config-layout">
+        <section class="panel">
+          <div class="panel-head"><h2>Parámetros globales</h2></div>
+          <div class="panel-body">
+            <form id="configForm">
+              <div class="form-grid">
+                <div class="field">
+                  <label for="cfgTasaBcv">Tasa BCV (Bs por USD)</label>
+                  <input type="number" id="cfgTasaBcv" min="0.01" step="0.01" required>
+                  <span class="hint">Oficial, desde bcv.org.ve. Se actualiza sola cada 6 horas.</span>
+                </div>
+                <div class="field">
+                  <label for="cfgTasaCompra">Tasa USDT / dólar físico (Bs por USD)</label>
+                  <input type="number" id="cfgTasaCompra" min="0.01" step="0.01" required>
+                  <span class="hint">Desde Binance P2P (respaldo: dólar paralelo). Es tu tasa real de compra.</span>
+                </div>
+                <div class="field full">
+                  <div class="bcv-action">
+                    <button type="button" class="btn ghost sm" id="cfgTasasFetch">Actualizar tasas ahora</button>
+                    <span class="small muted" id="cfgTasasStatus"></span>
+                  </div>
+                  <span class="hint">El factor de cambio del inventario es <strong>USDT / BCV</strong>.</span>
+                </div>
+                <div class="field">
+                  <label for="cfgIva">IVA (%)</label>
+                  <input type="number" id="cfgIva" min="0" step="0.01" required>
+                  <span class="hint">Impuesto agregado al precio de venta.</span>
+                </div>
+                <div class="field">
+                  <label for="cfgMargen">Margen de ganancia (%)</label>
+                  <input type="number" id="cfgMargen" min="0" step="0.01" required>
+                  <span class="hint">Margen de ganancia sobre el costo convertido con el factor Binance/BCV.</span>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn" id="cfgSave">Guardar configuración</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section class="stack">
+          <div class="panel">
+            <div class="panel-head"><h2>Cómo se calcula el precio</h2></div>
+            <div class="panel-body">
+              <div class="formula">
+                <span class="c">factor</span> = tasa_usdt / tasa_bcv<br>
+                <span class="c">precio_sin_iva</span> = costo × factor × (1 + margen/100)<br>
+                <span class="c">precio_usd</span> = precio_sin_iva × (1 + iva/100)<br>
+                <span class="c">precio_bs</span> = precio_usd × tasa_bcv
+              </div>
+              <div class="config-example" id="configExample"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h2>Buenas prácticas</h2></div>
+            <div class="panel-body small muted" style="display:grid; gap:9px;">
+              <p>· Las tasas BCV y USDT se actualizan solas; puedes forzarlas con <strong>Actualizar tasas ahora</strong>.</p>
+              <p>· El margen por producto es opcional: si lo dejas vacío se usa el global.</p>
+              <p>· Las ventas descuentan stock de forma atómica; no se puede vender más de lo disponible.</p>
+              <p>· El enlace público (<a href="consulta.html" target="_blank" rel="noopener">consulta.html</a>) nunca muestra costos ni márgenes.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===================== MODAL PRODUCTO ===================== -->
+<dialog id="productDialog">
+  <form id="productForm" method="dialog">
+    <div class="modal-head">
+      <div>
+        <h2 id="productDialogTitle">Nuevo producto</h2>
+        <p>Completa los datos. El precio se calcula automáticamente.</p>
+      </div>
+      <button type="button" class="modal-close" data-close="productDialog" aria-label="Cerrar">×</button>
+    </div>
+
+    <div class="modal-body">
+      <input type="hidden" id="prodId">
+      <div class="form-grid">
+        <div class="field">
+          <label for="prodCodigo">Código *</label>
+          <input type="text" id="prodCodigo" required maxlength="40" placeholder="Ej: CAP434" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="prodCategoria">Categoría</label>
+          <input type="text" id="prodCategoria" maxlength="60" placeholder="Ej: Capacitores" list="categoriasList">
+          <datalist id="categoriasList"></datalist>
+        </div>
+        <div class="field full">
+          <label for="prodNombre">Nombre *</label>
+          <input type="text" id="prodNombre" required maxlength="160" placeholder="Ej: CAPACITOR 25uF 450V">
+        </div>
+        <div class="field">
+          <label for="prodMarca">Marca</label>
+          <input type="text" id="prodMarca" maxlength="60" placeholder="Ej: LG, Samsung, Danfoss" list="marcasList">
+          <datalist id="marcasList"></datalist>
+        </div>
+        <div class="field">
+          <label for="prodPresentacion">Presentación</label>
+          <input type="text" id="prodPresentacion" maxlength="80" placeholder="Ej: PAQ DE 10 U">
+        </div>
+        <div class="field full">
+          <label for="prodDescripcion">Descripción</label>
+          <input type="text" id="prodDescripcion" maxlength="240" placeholder="Detalle adicional (opcional)">
+        </div>
+        <div class="field full">
+          <label for="prodTags">TAGs de búsqueda</label>
+          <input type="text" id="prodTags" maxlength="300" placeholder="Ej: nevera, refrigerador, bimetales, pila" list="tagsList">
+          <datalist id="tagsList"></datalist>
+          <span class="hint">Sepáralos con comas. Ayudan a encontrar el producto cuando el cliente usa otro nombre.</span>
+        </div>
+        <div class="field">
+          <label for="prodCosto">Costo en USD (tasa Binance) *</label>
+          <input type="number" id="prodCosto" min="0" step="0.0001" required value="0">
+          <span class="hint">Costo real de compra, en dólares a tasa Binance.</span>
+        </div>
+        <div class="field" id="prodStockField">
+          <label for="prodStock">Stock inicial</label>
+          <input type="number" id="prodStock" step="0.001" value="0">
+        </div>
+        <div class="field">
+          <label for="prodStockMin">Stock mínimo</label>
+          <input type="number" id="prodStockMin" min="0" step="0.001" value="3">
+        </div>
+        <div class="field">
+          <label for="prodMargen">Margen de ganancia (%)</label>
+          <input type="number" id="prodMargen" min="0" step="0.01" placeholder="Usar margen global">
+          <span class="hint">Se aplica sobre el costo ya multiplicado por el factor Binance/BCV.</span>
+        </div>
+        <div class="field">
+          <label for="prodIva">IVA propio (%)</label>
+          <input type="number" id="prodIva" min="0" step="0.01" placeholder="Usar IVA global">
+        </div>
+      </div>
+
+      <div class="calc-box" id="prodCalc" style="margin-top:16px;"></div>
+      <p class="small muted hidden" id="prodStockNote" style="margin-top:12px;">
+        El stock se modifica desde <strong>Ajustar stock</strong> para mantener el historial de movimientos.
+      </p>
+
+      <div class="photo-manager" id="prodPhotos" hidden>
+        <div class="photo-head">
+          <div>
+            <span class="field-label">Fotos del producto</span>
+            <p class="hint">Hasta 4 imágenes. La marcada como principal aparece en la consulta pública.</p>
+          </div>
+          <label class="btn ghost sm" id="prodPhotoAddLabel" for="prodPhotoInput">Agregar foto</label>
+          <input type="file" id="prodPhotoInput" accept="image/*" multiple hidden>
+        </div>
+        <div class="photo-grid" id="prodPhotoGrid"></div>
+        <p class="small muted" id="prodPhotoNote"></p>
+      </div>
+      <p class="small muted" id="prodPhotoNewNote" style="margin-top:12px;" hidden>
+        Guarda el producto para poder agregarle fotos.
+      </p>
+    </div>
+
+    <div class="modal-foot">
+      <button type="button" class="btn ghost" data-close="productDialog">Cancelar</button>
+      <button type="submit" class="btn" id="prodSave">Guardar producto</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ===================== MODAL AJUSTE STOCK ===================== -->
+<dialog id="stockDialog">
+  <form id="stockForm" method="dialog">
+    <div class="modal-head">
+      <div>
+        <h2>Ajustar stock</h2>
+        <p id="stockProductName">Producto</p>
+      </div>
+      <button type="button" class="modal-close" data-close="stockDialog" aria-label="Cerrar">×</button>
+    </div>
+
+    <div class="modal-body">
+      <input type="hidden" id="stockProductId">
+      <div class="form-grid">
+        <div class="field">
+          <label for="stockTipo">Tipo de movimiento</label>
+          <select id="stockTipo">
+            <option value="entrada">Entrada (sumar)</option>
+            <option value="salida">Salida (restar)</option>
+            <option value="ajuste">Ajuste (fijar stock final)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="stockCantidad">Cantidad</label>
+          <input type="number" id="stockCantidad" min="0" step="0.001" required value="1">
+        </div>
+        <div class="field full">
+          <label for="stockMotivo">Motivo</label>
+          <input type="text" id="stockMotivo" maxlength="160" placeholder="Ej: compra a proveedor, merma, conteo físico…">
+        </div>
+      </div>
+
+      <div class="calc-box" id="stockPreview" style="margin-top:16px;"></div>
+    </div>
+
+    <div class="modal-foot">
+      <button type="button" class="btn ghost" data-close="stockDialog">Cancelar</button>
+      <button type="submit" class="btn" id="stockSave">Registrar movimiento</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+
+<noscript>
+  <p style="padding:24px; text-align:center;">Activa JavaScript para usar el panel de inventario.</p>
+</noscript>
+
+<script src="assets/app.js" type="module"></script>
+</body>
+</html>
