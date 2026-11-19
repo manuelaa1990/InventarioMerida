@@ -44,6 +44,7 @@ export default async function handler(req, res) {
           v.id,
           v.cliente,
           v.rif_cliente,
+          v.tipo_documento,
           v.nota,
           v.tasa_bcv,
           v.total_usd,
@@ -84,6 +85,7 @@ export default async function handler(req, res) {
           ...v,
           id: Number(v.id),
           rif_cliente: v.rif_cliente || '',
+          tipo_documento: v.tipo_documento || 'factura',
           tasa_bcv: toNumber(v.tasa_bcv),
           total_usd: toNumber(v.total_usd),
           total_bs: toNumber(v.total_bs),
@@ -112,12 +114,17 @@ export default async function handler(req, res) {
 
       const cliente = typeof body.cliente === 'string' ? body.cliente.trim().slice(0, 160) : '';
       const rifCliente = typeof body.rif_cliente === 'string' ? body.rif_cliente.trim().slice(0, 30) : '';
+      const tipoDocumento = body.tipo_documento || 'factura';
+      if (!['factura', 'nota_entrega'].includes(tipoDocumento)) {
+        throw new HttpError(400, 'Tipo de documento inválido');
+      }
       const nota = typeof body.nota === 'string' ? body.nota.trim().slice(0, 500) : '';
 
       const [venta] = await sql`
         select * from registrar_venta(
           ${cliente},
           ${rifCliente},
+          ${tipoDocumento},
           ${nota},
           ${tasaBcv},
           ${cfg.iva_pct},

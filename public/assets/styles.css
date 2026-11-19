@@ -781,6 +781,8 @@ dialog.wide { width: min(860px, calc(100% - 28px)); }
 .pos-workspace { display: grid; gap: 18px; min-width: 0; }
 .pos-panel { overflow: hidden; }
 .pos-customer { padding: 0 18px 18px; }
+.pos-document-type { display: grid; gap: 5px; padding: 0 18px 18px; }
+.pos-document-type label { color: var(--ink-soft); font-size: .78rem; font-weight: 700; }
 .pos-search { margin: 0 18px 14px; max-width: none; }
 .pos-results { display: grid; border-top: 1px solid var(--line); }
 .pos-result { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 12px 18px; border: 0; border-bottom: 1px solid var(--line); background: #fff; text-align: left; }

@@ -13,6 +13,7 @@ const state = {
   productos: [],
   config: { tasa_bcv: 1, iva_pct: 16 },
   cart: [],
+  tipoDocumento: 'factura',
 };
 
 function moneyUsd(value) {
@@ -107,14 +108,17 @@ function renderCart() {
   body.innerHTML = state.cart.map((item) => {
     const product = productById(item.id);
     if (!product) return '';
-    const lineTotal = item.cantidad * item.precio;
+    const displayPrice = state.tipoDocumento === 'nota_entrega'
+      ? item.precio / (1 + (Number(state.config.iva_pct) || 16) / 100)
+      : item.precio;
+    const lineTotal = item.cantidad * displayPrice;
     return `
       <tr>
         <td>
           <div class="pos-product-name"><strong>${esc(product.nombre)}</strong><small>${esc(product.codigo)}</small></div>
         </td>
         <td class="right"><input class="pos-quantity" type="number" min="0.001" max="${product.stock}" step="0.001" value="${item.cantidad}" data-quantity="${product.id}" aria-label="Cantidad de ${esc(product.nombre)}"></td>
-        <td class="right num">${moneyUsd(item.precio)}</td>
+        <td class="right num">${moneyUsd(displayPrice)}</td>
         <td class="right num"><strong>${moneyUsd(lineTotal)}</strong></td>
         <td class="right"><button class="icon-btn danger" type="button" data-remove-product="${product.id}" title="Quitar producto" aria-label="Quitar producto">×</button></td>
       </tr>
@@ -127,16 +131,24 @@ function renderCart() {
 function renderTotals() {
   const iva = Number(state.config.iva_pct) || 16;
   const rate = Number(state.config.tasa_bcv) || 1;
-  const subtotal = state.cart.reduce((total, item) => total + item.cantidad * item.precio, 0);
-  const ivaAmount = subtotal - subtotal / (1 + iva / 100);
+  const subtotalBruto = state.cart.reduce((total, item) => total + item.cantidad * item.precio, 0);
+  const subtotal = state.tipoDocumento === 'nota_entrega'
+    ? subtotalBruto / (1 + iva / 100)
+    : subtotalBruto;
+  const ivaAmount = state.tipoDocumento === 'nota_entrega' ? 0 : subtotal - subtotal / (1 + iva / 100);
   const total = subtotal;
 
+  $('#subtotalLabel').textContent = state.tipoDocumento === 'nota_entrega' ? 'Subtotal sin IVA' : 'Subtotal';
+  $('#ivaRow').hidden = state.tipoDocumento === 'nota_entrega';
   $('#subtotalUsd').textContent = moneyUsd(subtotal);
   $('#ivaLabel').textContent = number(iva);
   $('#ivaUsd').textContent = moneyUsd(ivaAmount);
   $('#totalUsd').textContent = moneyUsd(total);
   $('#totalBs').textContent = moneyBs(total * rate);
   $('#rateLabel').textContent = `Tasa BCV aplicada: ${moneyBs(rate)}`;
+  $('#issueInvoice').textContent = state.tipoDocumento === 'nota_entrega'
+    ? 'Emitir Nota de Entrega'
+    : 'Emitir Factura';
 }
 
 function updateQuantity(id, value) {
@@ -193,6 +205,7 @@ async function issueInvoice() {
       body: JSON.stringify({
         cliente: $('#customerName').value.trim(),
         rif_cliente: rif,
+        tipo_documento: state.tipoDocumento,
         nota: note,
         tasa_bcv: Number(state.config.tasa_bcv),
         items: state.cart.map((item) => ({
@@ -204,11 +217,12 @@ async function issueInvoice() {
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || 'No se pudo emitir la factura.');
-    window.location.href = `factura.html?id=${encodeURIComponent(data.venta.id)}`;
+    const documentoUrl = state.tipoDocumento === 'nota_entrega' ? 'nota-entrega.html' : 'factura.html';
+    window.location.href = `${documentoUrl}?id=${encodeURIComponent(data.venta.id)}`;
   } catch (error) {
     showState(error.message, true);
     button.disabled = false;
-    button.textContent = 'Emitir factura';
+    button.textContent = state.tipoDocumento === 'nota_entrega' ? 'Emitir Nota de Entrega' : 'Emitir Factura';
   }
 }
 
@@ -228,5 +242,9 @@ $('#cartBody').addEventListener('change', (event) => {
   if (quantity) updateQuantity(quantity.dataset.quantity, quantity.value);
 });
 $('#issueInvoice').addEventListener('click', issueInvoice);
+$('#documentType').addEventListener('change', (event) => {
+  state.tipoDocumento = event.target.value;
+  renderTotals();
+});
 
 loadData();

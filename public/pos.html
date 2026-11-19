@@ -52,6 +52,13 @@
               <input type="text" id="customerRif" maxlength="30" placeholder="J-00000000-0">
             </div>
           </div>
+          <div class="pos-document-type">
+            <label for="documentType">Tipo de documento</label>
+            <select id="documentType">
+              <option value="factura" selected>Factura Fiscal</option>
+              <option value="nota_entrega">Nota de Entrega</option>
+            </select>
+          </div>
         </section>
 
         <section class="panel pos-panel">
@@ -99,8 +106,8 @@
           </div>
         </div>
         <div class="pos-total-lines">
-          <div><span>Subtotal</span><strong id="subtotalUsd">$0.00</strong></div>
-          <div><span>IVA (<span id="ivaLabel">16</span>%)</span><strong id="ivaUsd">$0.00</strong></div>
+          <div><span id="subtotalLabel">Subtotal</span><strong id="subtotalUsd">$0.00</strong></div>
+          <div id="ivaRow"><span>IVA (<span id="ivaLabel">16</span>%)</span><strong id="ivaUsd">$0.00</strong></div>
           <div class="total"><span>Total USD</span><strong id="totalUsd">$0.00</strong></div>
           <div class="total-bs"><span>Total en bolívares</span><strong id="totalBs">Bs 0,00</strong></div>
         </div>
@@ -108,7 +115,7 @@
           <label for="saleNote">Nota (opcional)</label>
           <textarea id="saleNote" maxlength="500" placeholder="Detalles de la venta..."></textarea>
         </div>
-        <button class="btn block" id="issueInvoice" type="button">Emitir factura</button>
+        <button class="btn block" id="issueInvoice" type="button">Emitir Factura</button>
         <p class="small muted pos-security">La venta descuenta el inventario al emitir la factura.</p>
       </aside>
     </div>

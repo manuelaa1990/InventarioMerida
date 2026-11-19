@@ -70,6 +70,7 @@ create table if not exists ventas (
   id               bigserial primary key,
   cliente          text not null default '',
   rif_cliente      text not null default '',
+  tipo_documento   text not null default 'factura' check (tipo_documento in ('factura', 'nota_entrega')),
   nota             text not null default '',
   tasa_bcv         numeric(14,4) not null,
   total_usd        numeric(14,4) not null default 0,
@@ -80,6 +81,7 @@ create table if not exists ventas (
 );
 
 alter table ventas add column if not exists rif_cliente text not null default '';
+alter table ventas add column if not exists tipo_documento text not null default 'factura';
 
 create index if not exists ventas_fecha_idx on ventas (fecha desc);
 
@@ -133,10 +135,12 @@ on conflict (clave) do nothing;
 -- p_items = [{"producto_id":1,"cantidad":2,"precio_unitario_usd":1.35}]
 -- ------------------------------------------------------------
 drop function if exists registrar_venta(text, text, numeric, numeric, jsonb);
+drop function if exists registrar_venta(text, text, text, numeric, numeric, jsonb);
 
 create or replace function registrar_venta(
   p_cliente  text,
   p_rif_cliente text,
+  p_tipo_documento text,
   p_nota     text,
   p_tasa_bcv numeric,
   p_iva_pct  numeric,
@@ -162,9 +166,12 @@ begin
   if p_tasa_bcv is null or p_tasa_bcv <= 0 then
     raise exception 'La tasa BCV debe ser mayor que cero';
   end if;
+  if p_tipo_documento not in ('factura', 'nota_entrega') then
+    raise exception 'Tipo de documento inválido';
+  end if;
 
-  insert into ventas (cliente, rif_cliente, nota, tasa_bcv)
-  values (coalesce(p_cliente, ''), coalesce(p_rif_cliente, ''), coalesce(p_nota, ''), p_tasa_bcv)
+  insert into ventas (cliente, rif_cliente, tipo_documento, nota, tasa_bcv)
+  values (coalesce(p_cliente, ''), coalesce(p_rif_cliente, ''), p_tipo_documento, coalesce(p_nota, ''), p_tasa_bcv)
   returning id into v_id;
 
   for it in
@@ -213,6 +220,10 @@ begin
     v_costo    := v_costo + (it.cantidad * v_costo_u);
     v_utilidad := v_utilidad + v_util;
   end loop;
+
+  if p_tipo_documento = 'nota_entrega' then
+    v_total := v_total / (1 + coalesce(p_iva_pct, 0) / 100);
+  end if;
 
   update ventas
      set total_usd       = v_total,

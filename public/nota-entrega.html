@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nota de Entrega · Repuestos MERIDA</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="invoice-page">
+  <main class="invoice-shell">
+    <div class="invoice-toolbar no-print">
+      <a class="btn ghost sm" href="pos.html">Volver al punto de venta</a>
+      <button class="btn sm" id="printDeliveryNote" type="button">Imprimir nota</button>
+    </div>
+
+    <section class="invoice-paper">
+      <header class="invoice-header">
+        <div>
+          <div class="invoice-brand"><img src="assets/logo-512.png" alt="Logo de Repuestos MERIDA"></div>
+          <h1>Repuestos MERIDA</h1>
+          <p>Repuestos de refrigeracion y aire acondicionado</p>
+          <p>RIF: J-508305876</p>
+          <p>CALLE DON BOSCO CASA N/A NRO S/N SECTOR CREOLANDIA, JUDIBANA, FALCON, VENEZUELA</p>
+          <p>Telefono: 04246926108 / 04126666397</p>
+        </div>
+        <div class="invoice-meta">
+          <span class="invoice-label">NOTA DE ENTREGA N°</span>
+          <strong id="deliveryNumber">—</strong>
+          <span id="deliveryDate">—</span>
+        </div>
+      </header>
+
+      <section class="invoice-customer">
+        <div>
+          <span class="invoice-label">Cliente</span>
+          <strong id="customerName">—</strong>
+          <span class="invoice-customer-rif" id="customerRif">—</span>
+        </div>
+        <div>
+          <span class="invoice-label">Tasa BCV de referencia</span>
+          <strong id="deliveryRate">—</strong>
+        </div>
+      </section>
+
+      <div id="deliveryState" class="invoice-state" role="status">Cargando nota de entrega...</div>
+
+      <table class="invoice-lines" id="deliveryLines" hidden>
+        <thead>
+          <tr>
+            <th>Descripcion</th>
+            <th class="right">Cantidad</th>
+            <th class="right">Precio unitario</th>
+            <th class="right">Total</th>
+          </tr>
+        </thead>
+        <tbody id="deliveryItems"></tbody>
+      </table>
+
+      <section class="invoice-summary" id="deliverySummary" hidden>
+        <div class="invoice-total"><span>Total</span><strong id="deliveryTotal">—</strong></div>
+      </section>
+
+      <footer class="invoice-footer">
+        <p id="deliveryNote"></p>
+        <p>Documento de entrega. No constituye factura fiscal.</p>
+      </footer>
+    </section>
+  </main>
+  <script src="assets/nota-entrega.js" type="module"></script>
+</body>
+</html>
