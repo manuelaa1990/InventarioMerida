@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Factura · Repuestos MERIDA</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="invoice-page">
+  <main class="invoice-shell" id="invoiceDocument">
+    <div class="invoice-toolbar no-print">
+      <a class="btn ghost sm" href="index.html#ventas">Volver a ventas</a>
+      <button class="btn sm" id="printInvoice" type="button">Imprimir factura</button>
+    </div>
+
+    <section class="invoice-paper">
+      <header class="invoice-header">
+        <div>
+          <div class="invoice-brand"><img src="assets/logo-512.png" alt="Logo de Repuestos MERIDA"></div>
+          <h1>Repuestos MERIDA</h1>
+          <p>Repuestos de refrigeracion y aire acondicionado</p>
+          <p id="businessTaxId"></p>
+          <p id="businessAddress"></p>
+          <p id="businessPhone"></p>
+        </div>
+        <div class="invoice-meta">
+          <span class="invoice-label">NÚMERO DE CONTROL</span>
+          <strong id="invoiceNumber">—</strong>
+          <span id="invoiceDate">—</span>
+        </div>
+      </header>
+
+      <section class="invoice-customer">
+        <div>
+          <span class="invoice-label">Cliente</span>
+          <strong id="customerName">—</strong>
+          <span class="invoice-customer-rif" id="customerRif">—</span>
+        </div>
+        <div>
+          <span class="invoice-label">Tasa BCV aplicada</span>
+          <strong id="invoiceRate">—</strong>
+        </div>
+      </section>
+
+      <div id="invoiceState" class="invoice-state" role="status">Cargando factura...</div>
+
+      <table class="invoice-lines" id="invoiceLines" hidden>
+        <thead>
+          <tr>
+            <th>Descripcion</th>
+            <th class="right">Cantidad</th>
+            <th class="right">Precio unitario</th>
+            <th class="right">Total</th>
+          </tr>
+        </thead>
+        <tbody id="invoiceItems"></tbody>
+      </table>
+
+      <section class="invoice-summary" id="invoiceSummary" hidden>
+        <div><span>Base imponible</span><strong id="invoiceBase">—</strong></div>
+        <div><span>IVA (16%)</span><strong id="invoiceTax">—</strong></div>
+        <div class="invoice-total"><span>Total a pagar</span><strong id="invoiceTotal">—</strong></div>
+      </section>
+
+      <footer class="invoice-footer">
+        <p id="invoiceNote"></p>
+        <p>Gracias por su compra.</p>
+      </footer>
+    </section>
+  </main>
+  <script src="assets/factura.js" type="module"></script>
+</body>
+</html>

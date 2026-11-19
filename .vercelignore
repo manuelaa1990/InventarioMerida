@@ -1,0 +1,6 @@
+# Rutas antiguas que ya no se usan. Se excluyen del despliegue para no
+# superar el límite de 12 funciones serverless del plan Hobby de Vercel.
+# (Sus funciones están ahora en api/login.js y api/tasas.js.)
+api/logout.js
+api/me.js
+api/tasa-bcv.js

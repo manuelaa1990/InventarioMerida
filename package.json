@@ -1,0 +1,30 @@
+{
+  "name": "inventario-hvac",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Inventario y ventas para repuestos de refrigeración / HVAC con Neon + Vercel",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "dev:vercel": "vercel dev",
+    "deploy": "vercel --prod",
+    "db:apply": "node scripts/apply-db.mjs",
+    "db:schema": "node scripts/apply-db.mjs --schema",
+    "db:seed": "node scripts/apply-db.mjs --seed",
+    "db:check": "node scripts/apply-db.mjs --check",
+    "images:optimize": "node scripts/optimizar-fotos-viejas.mjs",
+    "check": "node --check public/assets/app.js && node --check public/assets/consulta.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
+    "@vercel/blob": "^2.9.0",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "pg": "^8.23.1",
+    "vercel": "^65.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

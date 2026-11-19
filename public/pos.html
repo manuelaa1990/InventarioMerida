@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0d9488">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Punto de Venta · Repuestos MERIDA</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/logo-512.png">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="pos-page">
+  <header class="pos-hero">
+    <div class="container">
+      <div class="public-header">
+        <div class="public-brand">
+          <span class="brand-mark small">HV</span>
+          <div>
+            <strong>Repuestos MERIDA</strong>
+            <small>Punto de venta</small>
+          </div>
+        </div>
+        <a class="public-login" href="index.html#inventario" aria-label="Volver al panel" title="Volver al panel">←</a>
+      </div>
+      <h1>Nueva venta</h1>
+      <p>Busca productos, arma el pedido y emite la factura.</p>
+    </div>
+  </header>
+
+  <main class="container pos-main">
+    <div id="posState" class="pos-state" role="status">Cargando inventario...</div>
+
+    <div class="pos-layout" id="posContent" hidden>
+      <section class="pos-workspace">
+        <section class="panel pos-panel">
+          <div class="panel-head">
+            <div>
+              <h2>Datos del cliente</h2>
+              <p class="small muted">El RIF es opcional.</p>
+            </div>
+          </div>
+          <div class="pos-customer form-grid">
+            <div class="field">
+              <label for="customerName">Nombre</label>
+              <input type="text" id="customerName" maxlength="160" placeholder="Cliente general">
+            </div>
+            <div class="field">
+              <label for="customerRif">RIF (opcional)</label>
+              <input type="text" id="customerRif" maxlength="30" placeholder="J-00000000-0">
+            </div>
+          </div>
+        </section>
+
+        <section class="panel pos-panel">
+          <div class="panel-head">
+            <div>
+              <h2>Productos</h2>
+              <p class="small muted">Busca por codigo, nombre, categoria o TAG.</p>
+            </div>
+          </div>
+          <div class="pos-search search-box">
+            <span class="ico">⌕</span>
+            <input type="search" id="productSearch" placeholder="Buscar producto..." autocomplete="off">
+          </div>
+          <div class="pos-results" id="productResults"></div>
+        </section>
+
+        <section class="panel pos-panel">
+          <div class="panel-head">
+            <h2>Detalle de venta</h2>
+            <span class="badge neutral" id="itemCount">0 productos</span>
+          </div>
+          <div class="table-wrap">
+            <table class="data pos-lines">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th class="right">Cantidad</th>
+                  <th class="right">Precio unitario</th>
+                  <th class="right">Total</th>
+                  <th aria-label="Acciones"></th>
+                </tr>
+              </thead>
+              <tbody id="cartBody"></tbody>
+            </table>
+          </div>
+          <div class="empty" id="cartEmpty"><strong>Venta vacia</strong>Agrega productos desde el buscador.</div>
+        </section>
+      </section>
+
+      <aside class="pos-summary panel">
+        <div class="panel-head">
+          <div>
+            <h2>Resumen</h2>
+            <p class="small muted" id="rateLabel">Tasa BCV aplicada</p>
+          </div>
+        </div>
+        <div class="pos-total-lines">
+          <div><span>Subtotal</span><strong id="subtotalUsd">$0.00</strong></div>
+          <div><span>IVA (<span id="ivaLabel">16</span>%)</span><strong id="ivaUsd">$0.00</strong></div>
+          <div class="total"><span>Total USD</span><strong id="totalUsd">$0.00</strong></div>
+          <div class="total-bs"><span>Total en bolívares</span><strong id="totalBs">Bs 0,00</strong></div>
+        </div>
+        <div class="field pos-note">
+          <label for="saleNote">Nota (opcional)</label>
+          <textarea id="saleNote" maxlength="500" placeholder="Detalles de la venta..."></textarea>
+        </div>
+        <button class="btn block" id="issueInvoice" type="button">Emitir factura</button>
+        <p class="small muted pos-security">La venta descuenta el inventario al emitir la factura.</p>
+      </aside>
+    </div>
+  </main>
+
+  <script src="assets/pos.js" type="module"></script>
+</body>
+</html>
