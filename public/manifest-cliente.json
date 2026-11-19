@@ -1,0 +1,20 @@
+{
+  "name": "Repuestos Mérida - Catálogo",
+  "short_name": "Catálogo Mérida",
+  "description": "Catálogo público de repuestos de refrigeración y aire acondicionado.",
+  "lang": "es-VE",
+  "start_url": "/consulta.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0d9488",
+  "background_color": "#f3f6f7",
+  "icons": [
+    {
+      "src": "/assets/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
